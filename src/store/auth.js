@@ -1,0 +1,3 @@
+export default {
+  isLogined: false
+};
