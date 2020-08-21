@@ -1,5 +1,5 @@
 import Loading from './Loading/Loading'
-import ListVehicle from './ListVehicle/ListVehicle'
+import ListPhotos from './ListPhotos/ListPhotos'
 import NotificationPopup from './NotificationPopup/NotificationPopup'
 
-export { Loading, ListVehicle, NotificationPopup }
+export { Loading, ListPhotos, NotificationPopup }

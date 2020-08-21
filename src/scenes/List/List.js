@@ -1,11 +1,121 @@
-import React from 'react'
-import { Switch, Route, useRouteMatch, Link } from 'react-router-dom'
+import React, { useState } from 'react'
 
 import ListWrapper from './ListWrapper'
-
-import { ListVehicle } from '../../components'
+import { ListPhotos } from '../../components'
 
 export default function List (props) {
+  const items = [
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg',
+    'bird.jpg'
+  ]
+
+  const [images, setImages] = useState(items)
+  const handleLoadmore = () => {
+    const tmp = [
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg',
+      'bird2.jpg'
+    ]
+    setImages([...images, ...tmp])
+  }
+
   return (
     <ListWrapper>
       <div className='list__header'>
@@ -21,7 +131,10 @@ export default function List (props) {
         </div>
       </div>
       <div className='list__body'>
-        <ListVehicle />
+        <ListPhotos items={images} />
+        <div className='list__body__action'>
+          <button onClick={handleLoadmore}>Load More</button>
+        </div>
       </div>
     </ListWrapper>
   )
