@@ -11,7 +11,11 @@ const ITEM_PER_ROW = 5
 const ROW_HEIGHT = 220 + GUTTER_SIZE
 const _columnWidth = width => width / 5 - GUTTER_SIZE
 
-export default function ListPhotos ({ items }) {
+export default function ListPhotos ({
+  items,
+  onScrollDown = () => {},
+  onScrollUp = () => {}
+}) {
   const [images, setImages] = useState([])
   const onLongPress = () => {
     const yes = window.confirm('Are you sure to delete this image?')
@@ -23,6 +27,9 @@ export default function ListPhotos ({ items }) {
 
   const longPressEvent = useLongPress(onLongPress, onClick)
 
+  const handleScroll = ({ verticalScrollDirection }) => {
+    verticalScrollDirection === 'forward' ? onScrollDown() : onScrollUp()
+  }
   const CheckBox = function (props) {
     const [checked, check] = useState(false)
 
@@ -47,7 +54,7 @@ export default function ListPhotos ({ items }) {
       height: style.height - GUTTER_SIZE
     }
 
-    return (
+    return items[rowIndex][columnIndex] == undefined ? null : (
       <div
         key={`${columnIndex}-${rowIndex}`}
         className='list-photo__grid__item'
@@ -57,13 +64,15 @@ export default function ListPhotos ({ items }) {
       >
         <CheckBox />
         <div className='list-photo__grid__item__image'>
-          <img src={items[rowIndex][columnIndex]} />
+          <img src={items[rowIndex][columnIndex]['raw']} />
         </div>
         <div className='list-photo__grid__item__info'>
           <p className='list-photo__grid__item__info__imageName'>
-            read-12354.jpg
+            {items[rowIndex][columnIndex]['name']}
           </p>
-          <p className='list-photo__grid__item__info__category'>Nature</p>
+          <p className='list-photo__grid__item__info__category'>
+            {items[rowIndex][columnIndex]['album']}
+          </p>
         </div>
       </div>
     )
@@ -76,6 +85,7 @@ export default function ListPhotos ({ items }) {
       columnWidth={_columnWidth(width)}
       height={height}
       width={width}
+      onScroll={handleScroll}
       rowCount={items.length}
       rowHeight={ROW_HEIGHT}
       autoHeight={true}
@@ -90,8 +100,9 @@ export default function ListPhotos ({ items }) {
   }, [items.length])
 
   return (
-    <ListPhotosWrapper>
-      <AutoSizer>{GridRenderer(images)}</AutoSizer>
+    <ListPhotosWrapper className={!items.length && 'no-data'}>
+      {!items.length && <h4>No photos available</h4>}
+      {!!items.length && <AutoSizer>{GridRenderer(images)}</AutoSizer>}
     </ListPhotosWrapper>
   )
 }

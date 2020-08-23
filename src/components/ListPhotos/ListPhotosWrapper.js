@@ -2,6 +2,12 @@ import styled from 'styled-components'
 
 export default styled.div`
   height: 100%;
+  &.no-data {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
   .list-photo {
     &__grid {
       > div {
@@ -24,6 +30,7 @@ export default styled.div`
           height: 70%;
           background-color: #ccc3;
           img {
+            max-width: 100%;
             height: 100%;
           }
         }
@@ -34,6 +41,9 @@ export default styled.div`
           }
           &__imageName {
             font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
           }
           &__category {
             font-size: 0.7rem;

@@ -12,10 +12,17 @@ export default function DragNDropPopup ({
 }) {
   const dropBoxEl = useRef(null)
   const inputFilesEl = useRef(null)
-  const [uploadedImgs, setImgs] = useState([])
   const [previewImgs, setPreviewImgs] = useState([])
   const [errMsg, setErrorMsg] = useState('')
+  const categoryRef = useRef(null)
+  const uploadedImgsRef = useRef([])
 
+  const resetAllValue = () => {
+    setPreviewImgs([])
+    setErrorMsg('')
+    categoryRef.current = null
+    uploadedImgsRef.current = []
+  }
   const validationFile = selectedImgs => {
     let validatedFiles = []
     let errMsg = ''
@@ -23,7 +30,7 @@ export default function DragNDropPopup ({
       const file = selectedImgs[i]
       const filename = file.name
       const extension = filename.split('.').pop()
-
+      const uploadedImgs = uploadedImgsRef.current
       const isDuplicateFile = uploadedImgs.find(img => img.name === filename)
 
       if (uploadedImgs.length && isDuplicateFile) {
@@ -61,8 +68,8 @@ export default function DragNDropPopup ({
     } else {
       setErrorMsg('')
     }
-
-    setImgs([...uploadedImgs, ...validatedFiles])
+    const uploadedImgs = uploadedImgsRef.current
+    uploadedImgsRef.current = [...uploadedImgs, ...validatedFiles]
     const promiseReadSrcFiles = validatedFiles.map(file => readSrcFile(file))
     Promise.all(promiseReadSrcFiles).then(srcs => {
       setPreviewImgs([...previewImgs, ...srcs])
@@ -71,6 +78,12 @@ export default function DragNDropPopup ({
 
   const handleDragOver = () => addClass(dropBoxEl.current)('dragover')
   const handleDragLeave = () => removeClass(dropBoxEl.current)('dragover')
+  const handleUploadFiles = () =>
+    onUploadFile(uploadedImgsRef.current, categoryRef.current, () =>
+      resetAllValue()
+    )
+
+  const handleChangeCategory = e => (categoryRef.current = e.target.value)
 
   const clickOutsideModalContent = e =>
     e.target == e.currentTarget && toogleModal()
@@ -130,15 +143,15 @@ export default function DragNDropPopup ({
           </div>
         </div>
         <div className='modal__footer'>
-          <select>
-            <option>Select Album</option>
-            <option>Travel</option>
-            <option>Personal</option>
-            <option>Food</option>
-            <option>Nature</option>
-            <option>Other</option>
+          <select onChange={handleChangeCategory}>
+            <option value=''>Select Album</option>
+            <option value='Travel'>Travel</option>
+            <option value='Personal'>Personal</option>
+            <option value='Food'>Food</option>
+            <option value='Nature'>Nature</option>
+            <option value='Nature'>Other</option>
           </select>
-          <button onClick={onUploadFile}>Upload</button>
+          <button onClick={handleUploadFiles}>Upload</button>
         </div>
       </div>
     </DragNDropModalWrapper>

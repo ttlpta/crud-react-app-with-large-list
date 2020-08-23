@@ -1,125 +1,81 @@
-import React, { useState } from 'react'
-
+import React, { useEffect, useState, useRef } from 'react'
 import ListWrapper from './ListWrapper'
 import { ListPhotos, DragNDropModal } from '../../components'
 
+import useNotification from '../../hooks/useNotification'
+import { list, uploadPhotos } from '../../Services/PhotoService'
+
+import { hasClass, removeClass, addClass } from '../../utils/interactiveHtml'
+
 export default function List (props) {
-  const items = [
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg',
-    'bird.jpg'
-  ]
-
   const [isShowUploadModal, toogleModal] = useState(false)
+  const [images, setImages] = useState([])
+  const [itemPerPage, setItemPerPage] = useState(25)
+  const [isShowLoadMore, showLoadmore] = useState(false)
+  const [isLoading, showLoading] = useState(false)
+  const { showError, showSuccess } = useNotification()
+  const skip = useRef(0)
+  const loadMoreBtnRef = useRef(null)
 
-  const [images, setImages] = useState(items)
-  const handleLoadmore = () => {
-    const tmp = [
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg',
-      'bird2.jpg'
-    ]
-    setImages([...images, ...tmp])
+  useEffect(() => {
+    skip.current = 0
+    getList(skip.current, itemPerPage, function (imgs) {
+      setImages(imgs)
+    })
+  }, [itemPerPage])
+
+  const getList = (skip, itemPerPage, cb) => {
+    showLoading(true)
+    list(skip, +itemPerPage)
+      .then(images => {
+        // setImages(images)
+        cb(images)
+        showLoadmore(images.length >= itemPerPage)
+      })
+      .catch(e => showError(e.message))
+      .finally(() => showLoading(false))
   }
-
   const handleToogleModal = () => toogleModal(!isShowUploadModal)
-  const handleUploadImages = () => handleToogleModal()
+  const handleUploadImages = (files, category, cb) => {
+    if (!files.length || !category) {
+      showError('Missing file or album')
+      return
+    }
+    const bodyFormData = new FormData()
+    bodyFormData.append('album', category)
+    for (const file of files) {
+      bodyFormData.append('documents', file)
+    }
+
+    uploadPhotos(bodyFormData)
+      .then(res => {
+        if (res.message === 'OK') {
+          skip.current = 0
+          cb()
+          getList(skip.current, itemPerPage, function (imgs) {
+            showSuccess('Uploaded success')
+            setImages(imgs)
+          })
+        } else {
+          showError(res.message)
+        }
+      })
+      .catch(e => showError(e.message))
+      .finally(() => handleToogleModal())
+  }
+  const handleLoadMore = () => {
+    skip.current++
+    showLoading(true)
+    getList(skip.current, itemPerPage, function (imgs) {
+      setImages([...images, ...imgs])
+    })
+  }
+  const handleChangeItemPerPage = e => setItemPerPage(e.target.value)
+  const handleScrollDown = () => addClass(loadMoreBtnRef.current)('show')
+  const handleScrollUp = () =>
+    hasClass(loadMoreBtnRef.current)('show') &&
+    removeClass(loadMoreBtnRef.current)('show')
+
   return (
     <ListWrapper>
       <div className='list__header'>
@@ -127,19 +83,29 @@ export default function List (props) {
         <div className='list__header__options'>
           <button>Delete</button>
           <button onClick={handleToogleModal}>Upload</button>
-          <select>
-            <option>25</option>
-            <option>50</option>
-            <option>100</option>
+          <select onChange={handleChangeItemPerPage}>
+            <option value='25'>25</option>
+            <option value='50'>50</option>
+            <option value='100'>100</option>
           </select>
         </div>
       </div>
       <div className='list__body'>
-        <ListPhotos items={images} />
+        <ListPhotos
+          items={images}
+          onScrollDown={handleScrollDown}
+          onScrollUp={handleScrollUp}
+        />
         <div className='list__body__action'>
-          <button onClick={handleLoadmore}>Load More</button>
+          {isShowLoadMore && (
+            <button ref={loadMoreBtnRef} onClick={handleLoadMore}>
+              Load More
+            </button>
+          )}
         </div>
+        {isLoading && <div className='loading'>Loading...</div>}
       </div>
+
       <DragNDropModal
         show={isShowUploadModal}
         toogleModal={handleToogleModal}
