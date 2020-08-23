@@ -11,6 +11,11 @@ export default styled.div`
 
       &__item {
         text-align: center;
+        background-color: #ccc3;
+        cursor: pointer;
+        &:hover {
+          background-color: #cccccc75;
+        }
         img {
           height: 100%;
         }

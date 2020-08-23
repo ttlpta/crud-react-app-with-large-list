@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import ListWrapper from './ListWrapper'
-import { ListPhotos } from '../../components'
+import { ListPhotos, DragNDropModal } from '../../components'
 
 export default function List (props) {
   const items = [
@@ -94,6 +94,8 @@ export default function List (props) {
     'bird.jpg'
   ]
 
+  const [isShowUploadModal, toogleModal] = useState(false)
+
   const [images, setImages] = useState(items)
   const handleLoadmore = () => {
     const tmp = [
@@ -116,13 +118,15 @@ export default function List (props) {
     setImages([...images, ...tmp])
   }
 
+  const handleToogleModal = () => toogleModal(!isShowUploadModal)
+  const handleUploadImages = () => handleToogleModal()
   return (
     <ListWrapper>
       <div className='list__header'>
         <h3 className='list__header__title'>Photos</h3>
         <div className='list__header__options'>
           <button>Delete</button>
-          <button>Upload</button>
+          <button onClick={handleToogleModal}>Upload</button>
           <select>
             <option>25</option>
             <option>50</option>
@@ -136,6 +140,11 @@ export default function List (props) {
           <button onClick={handleLoadmore}>Load More</button>
         </div>
       </div>
+      <DragNDropModal
+        show={isShowUploadModal}
+        toogleModal={handleToogleModal}
+        onUploadFile={handleUploadImages}
+      />
     </ListWrapper>
   )
 }

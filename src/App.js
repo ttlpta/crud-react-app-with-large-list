@@ -5,7 +5,7 @@ import initStore from './store'
 
 import Normalize from './Normalize'
 import { NotificationPopup } from './components'
-import List from './scenes/List/List'
+import ListPage from './scenes/List/List'
 
 import themeLight from './themes/defaultTheme'
 
@@ -17,7 +17,7 @@ export default function App () {
       <Normalize />
       <NotificationPopup />
       <ThemeProvider theme={themeLight}>
-        <List />
+        <ListPage />
       </ThemeProvider>
     </Fragment>
   )
