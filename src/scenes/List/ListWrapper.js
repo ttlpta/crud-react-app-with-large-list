@@ -14,11 +14,12 @@ export default styled.div`
       &__options {
         > * {
           margin: 0px 8px;
+          font-family: cursive;
         }
       }
     }
     &__body {
-      height: calc(100% - 80px);
+      height: calc(100% - 60px);
       position: relative;
       .loading {
         position: absolute;
@@ -34,15 +35,18 @@ export default styled.div`
       }
       /* padding-bottom: 50px; */
       &__action {
-        height: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
+        position: absolute;
+        right: 0;
+        left: 0;
         button {
           transform: translateY(99px);
-          transition: 0.8s transform;
+          transition: 0.5s transform;
+          padding: 5px 5rem;
           &.show {
-            transform: translateY(0px);
+            transform: translateY(-39px);
           }
         }
       }

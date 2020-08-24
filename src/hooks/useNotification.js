@@ -1,4 +1,4 @@
-import React, { useDispatch } from "reactn";
+import { useDispatch } from "reactn";
 
 import { notificationReducer } from "../reducers";
 

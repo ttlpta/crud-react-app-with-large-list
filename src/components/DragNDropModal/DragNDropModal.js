@@ -1,5 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
+import Select from '../../styled-components/Select'
+import { PrimaryButton } from '../../styled-components/Button'
 import { hasClass, removeClass, addClass } from '../../utils/interactiveHtml'
 import DragNDropModalWrapper from './DragNDropModalWrapper'
 
@@ -86,7 +88,7 @@ export default function DragNDropPopup ({
   const handleChangeCategory = e => (categoryRef.current = e.target.value)
 
   const clickOutsideModalContent = e =>
-    e.target == e.currentTarget && toogleModal()
+    e.target === e.currentTarget && toogleModal()
 
   return (
     <DragNDropModalWrapper
@@ -134,7 +136,7 @@ export default function DragNDropPopup ({
                       key={`previewImage${index}`}
                       className='previewImg'
                       src={src}
-                      alt='preview image'
+                      alt='preview'
                     />
                   ))}
                 </div>
@@ -143,15 +145,15 @@ export default function DragNDropPopup ({
           </div>
         </div>
         <div className='modal__footer'>
-          <select onChange={handleChangeCategory}>
+          <Select onChange={handleChangeCategory}>
             <option value=''>Select Album</option>
             <option value='Travel'>Travel</option>
             <option value='Personal'>Personal</option>
             <option value='Food'>Food</option>
             <option value='Nature'>Nature</option>
             <option value='Nature'>Other</option>
-          </select>
-          <button onClick={handleUploadFiles}>Upload</button>
+          </Select>
+          <PrimaryButton onClick={handleUploadFiles}>Upload</PrimaryButton>
         </div>
       </div>
     </DragNDropModalWrapper>

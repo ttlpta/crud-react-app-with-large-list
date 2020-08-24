@@ -1,9 +1,18 @@
 import React, { useEffect, useState, useRef } from 'react'
+import _ from 'lodash'
+import uniqid from 'uniqid'
+
 import ListWrapper from './ListWrapper'
 import { ListPhotos, DragNDropModal } from '../../components'
-
+import { PrimaryButton } from '../../styled-components/Button'
+import Select from '../../styled-components/Select'
 import useNotification from '../../hooks/useNotification'
-import { list, uploadPhotos } from '../../Services/PhotoService'
+import {
+  list,
+  uploadPhotos,
+  deletePhotos,
+  deletePhoto
+} from '../../Services/PhotoService'
 
 import { hasClass, removeClass, addClass } from '../../utils/interactiveHtml'
 
@@ -13,16 +22,24 @@ export default function List (props) {
   const [itemPerPage, setItemPerPage] = useState(25)
   const [isShowLoadMore, showLoadmore] = useState(false)
   const [isLoading, showLoading] = useState(false)
+  const [isShowDeleteButon, showDeleteButton] = useState(false)
   const { showError, showSuccess } = useNotification()
+  const [idListPhotos, changeIdListPhotos] = useState('')
   const skip = useRef(0)
   const loadMoreBtnRef = useRef(null)
+  const selectedImages = useRef(null)
 
   useEffect(() => {
     skip.current = 0
     getList(skip.current, itemPerPage, function (imgs) {
       setImages(imgs)
+      changeIdListPhotos(uniqid())
     })
   }, [itemPerPage])
+
+  const reloadList = () => {
+    changeIdListPhotos(uniqid())
+  }
 
   const getList = (skip, itemPerPage, cb) => {
     showLoading(true)
@@ -36,7 +53,7 @@ export default function List (props) {
       .finally(() => showLoading(false))
   }
   const handleToogleModal = () => toogleModal(!isShowUploadModal)
-  const handleUploadImages = (files, category, cb) => {
+  const handleUploadImages = (files, category, resetForm) => {
     if (!files.length || !category) {
       showError('Missing file or album')
       return
@@ -51,10 +68,11 @@ export default function List (props) {
       .then(res => {
         if (res.message === 'OK') {
           skip.current = 0
-          cb()
+          resetForm()
           getList(skip.current, itemPerPage, function (imgs) {
             showSuccess('Uploaded success')
             setImages(imgs)
+            reloadList()
           })
         } else {
           showError(res.message)
@@ -76,31 +94,89 @@ export default function List (props) {
     hasClass(loadMoreBtnRef.current)('show') &&
     removeClass(loadMoreBtnRef.current)('show')
 
+  const handleSelectImage = items => {
+    selectedImages.current = items
+    showDeleteButton(!!items.length)
+  }
+
+  const handleClickDeleteMultiFiles = () => {
+    const yes = window.confirm('Are you sure to delete these files')
+    if (!yes) return
+    const newFormatImages = _(selectedImages.current)
+      .groupBy('album')
+      .map(function (items, album) {
+        return {
+          album: album,
+          documents: _.map(items, 'name').toString()
+        }
+      })
+      .value()
+    showLoading(true)
+    deletePhotos(newFormatImages)
+      .then(success => {
+        skip.current = 0
+        success
+          ? getList(skip.current, itemPerPage, function (imgs) {
+              showSuccess('Delete success')
+              setImages(imgs)
+              reloadList()
+            })
+          : showError('Delete fail')
+      })
+      .catch(e => showError(e.message))
+      .finally(() => showLoading(false))
+  }
+
+  const handleDeleteFile = image => {
+    const yes = window.confirm(`Are you sure to delete ${image.name}?`)
+    yes &&
+      deletePhoto(image)
+        .then(success => {
+          skip.current = 0
+          success
+            ? getList(skip.current, itemPerPage, function (imgs) {
+                showSuccess('Delete success')
+                setImages(imgs)
+                reloadList()
+              })
+            : showError('Delete fail')
+        })
+        .catch(e => showError(e.message))
+        .finally(() => showLoading(false))
+  }
+
   return (
     <ListWrapper>
       <div className='list__header'>
         <h3 className='list__header__title'>Photos</h3>
         <div className='list__header__options'>
-          <button>Delete</button>
-          <button onClick={handleToogleModal}>Upload</button>
-          <select onChange={handleChangeItemPerPage}>
+          {isShowDeleteButon && (
+            <PrimaryButton onClick={handleClickDeleteMultiFiles}>
+              Delete
+            </PrimaryButton>
+          )}
+          <PrimaryButton onClick={handleToogleModal}>Upload</PrimaryButton>
+          <Select onChange={handleChangeItemPerPage}>
             <option value='25'>25</option>
             <option value='50'>50</option>
             <option value='100'>100</option>
-          </select>
+          </Select>
         </div>
       </div>
       <div className='list__body'>
         <ListPhotos
+          id={idListPhotos}
           items={images}
           onScrollDown={handleScrollDown}
           onScrollUp={handleScrollUp}
+          onDeleteFile={handleDeleteFile}
+          handleSelectImage={handleSelectImage}
         />
         <div className='list__body__action'>
           {isShowLoadMore && (
-            <button ref={loadMoreBtnRef} onClick={handleLoadMore}>
+            <PrimaryButton ref={loadMoreBtnRef} onClick={handleLoadMore}>
               Load More
-            </button>
+            </PrimaryButton>
           )}
         </div>
         {isLoading && <div className='loading'>Loading...</div>}

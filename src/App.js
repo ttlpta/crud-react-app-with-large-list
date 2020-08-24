@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, Fragment, useGlobal } from 'reactn'
+import React, { Fragment } from 'react'
 import { ThemeProvider } from 'styled-components'
 
 import initStore from './store'

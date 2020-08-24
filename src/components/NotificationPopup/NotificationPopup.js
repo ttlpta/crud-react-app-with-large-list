@@ -1,4 +1,4 @@
-import React, { useGlobal, useDispatch, addCallback, useEffect } from 'reactn'
+import React, { useGlobal, useDispatch, addCallback } from 'reactn'
 
 import NotificationPopupWrapper from './NotificationPopupWrapper'
 import { notificationReducer } from '../../reducers'

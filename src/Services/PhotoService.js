@@ -2,7 +2,7 @@ import axios from '../axios'
 
 export const list = async (skip, limit) => {
   try {
-    const { data } = await axios.post('/photos/list', {
+    const { data } = await axios.post('photos/list', {
       skip,
       limit
     })
@@ -19,6 +19,28 @@ export const uploadPhotos = async formData => {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     return data
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deletePhotos = async bodyRaw => {
+  console.log(bodyRaw);
+  try {
+    const { data } = await axios.delete('photos', { data : bodyRaw })
+    
+    return data.message === 'OK'
+  } catch (error) {
+    throw error
+  }
+}
+
+export const deletePhoto = async photo => {
+  
+  try {
+    const { data } = await axios.delete(`photos/${photo.album}/${photo.name}`)
+    
+    return data.message === 'OK'
   } catch (error) {
     throw error
   }
