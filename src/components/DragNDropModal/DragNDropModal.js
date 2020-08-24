@@ -22,7 +22,6 @@ export default function DragNDropPopup ({
   const resetAllValue = () => {
     setPreviewImgs([])
     setErrorMsg('')
-    categoryRef.current = null
     uploadedImgsRef.current = []
   }
   const validationFile = selectedImgs => {
@@ -52,7 +51,7 @@ export default function DragNDropPopup ({
     return new Promise((resolve, reject) => {
       const reader = new FileReader()
       reader.onloadend = function () {
-        resolve(reader.result)
+        resolve({ name: file.name, src: reader.result })
       }
 
       reader.onerror = reject
@@ -73,8 +72,8 @@ export default function DragNDropPopup ({
     const uploadedImgs = uploadedImgsRef.current
     uploadedImgsRef.current = [...uploadedImgs, ...validatedFiles]
     const promiseReadSrcFiles = validatedFiles.map(file => readSrcFile(file))
-    Promise.all(promiseReadSrcFiles).then(srcs => {
-      setPreviewImgs([...previewImgs, ...srcs])
+    Promise.all(promiseReadSrcFiles).then(imgs => {
+      setPreviewImgs([...previewImgs, ...imgs])
     })
   }
 
@@ -89,6 +88,14 @@ export default function DragNDropPopup ({
 
   const clickOutsideModalContent = e =>
     e.target === e.currentTarget && toogleModal()
+
+  const handleRemoveUploadingImg = name => {
+    uploadedImgsRef.current = uploadedImgsRef.current.filter(
+      file => file.name !== name
+    )
+
+    setPreviewImgs(previewImgs.filter(img => img.name !== name))
+  }
 
   return (
     <DragNDropModalWrapper
@@ -131,12 +138,13 @@ export default function DragNDropPopup ({
               )}
               {!!previewImgs.length && (
                 <div>
-                  {previewImgs.map((src, index) => (
+                  {previewImgs.map((img, index) => (
                     <img
-                      key={`previewImage${index}`}
+                      onClick={() => handleRemoveUploadingImg(img.name)}
+                      key={`previewImage${img.name}`}
                       className='previewImg'
-                      src={src}
-                      alt='preview'
+                      src={img.src}
+                      alt='Click to remove this image'
                     />
                   ))}
                 </div>

@@ -30,8 +30,9 @@ export default styled.div`
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: #131212a6;
+        background-color: #08080842;
         color: #fff;
+        font-size: 1.5rem;
       }
       /* padding-bottom: 50px; */
       &__action {

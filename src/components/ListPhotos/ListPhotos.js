@@ -132,7 +132,7 @@ const ListPhotos = React.memo(
 
     return (
       <ListPhotosWrapper className={!items.length && 'no-data'}>
-        {!items.length && <h4>No photos available</h4>}
+        {!items.length && <p>No photos available</p>}
         {!!items.length && <AutoSizer>{GridRenderer(images)}</AutoSizer>}
       </ListPhotosWrapper>
     )

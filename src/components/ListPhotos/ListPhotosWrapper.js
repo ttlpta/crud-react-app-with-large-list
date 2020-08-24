@@ -6,6 +6,11 @@ export default styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+    p {
+      color: #dcdcdc;
+      font-weight: normal;
+      font-size: 0.8rem;
+    }
   }
 
   .list-photo {

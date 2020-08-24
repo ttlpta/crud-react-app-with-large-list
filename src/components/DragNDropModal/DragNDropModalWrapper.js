@@ -89,6 +89,10 @@ export default styled.div`
           .previewImg {
             max-width: 40px;
             margin-right: 10px;
+            &:hover {
+              cursor: pointer;
+              opacity: 0.6;
+            }
           }
         }
       }
